@@ -1,22 +1,43 @@
 ﻿var database = require("../common/database");
+var pg = require('pg');
 
-//TODO Turn these all into stupid stored procedures
-
-var searchTeam = function (teamName, callback) {
-    var query = 'select * from Team where TeamName=\'' + teamName + '\'';
-    database.ExecuteSimpleQuery(query, function (content, err) {
-        callback(content, err);
+var searchTeam = function(teamName, callback) {
+    pg.connect(database.connectionString, function(err, client, done) {
+        if (err) {
+            callback(err);
+            return;
+        }
+        client.query('select team_id as "teamID", team_name as "teamName", team_city as "teamCity", stadium_name as "stadiumName", position, sport_id as "sportID" from teams where team_name=$1::text', [teamName], function(err, result) {
+            done();
+            if (err) {
+                callback(err);
+                return;
+            }
+            console.log(result.rows);
+            callback(null, result.rows);
+        });
     });
 }
 
-var searchTeamByID = function (teamID, callback) {
-    var query = 'select * from Team where TeamID=' + teamID ;
-    database.ExecuteSimpleQuery(query, function (content, err) {
-        callback(content, err);
+var searchTeamByID = function(teamID, callback) {
+    pg.connect(database.connectionString, function(err, client, done) {
+        if (err) {
+            callback(err);
+            return;
+        }
+        client.query('select team_id as "teamID", team_name as "teamName", team_city as "teamCity", stadium_name as "stadiumName", position, sport_id as "sportID" from teams where team_id=$1::bigint', [teamID], function(err, result) {
+            done();
+            if (err) {
+                callback(err);
+                return;
+            }
+            console.log(result.rows);
+            callback(null, result.rows);
+        });
     });
 }
 
 module.exports = {
-    SearchTeam: searchTeam,
-    SearchTeamByID: searchTeamByID
+    searchTeam: searchTeam,
+    searchTeamByID: searchTeamByID
 }
