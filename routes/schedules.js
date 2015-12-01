@@ -5,12 +5,11 @@ var scheduleService = require('../services/scheduleService.js');
 var router = express.Router();
 
 /* GET schedules of a team *
- * Query string ?teamID={ID}*/
+ * Query string ?teamID={teamID}*/
 router.get('/', function(req, res) {
     var url_parts = url.parse(req.url, true);
-    res.setHeader('Access-Control-Allow-Origin', '*'); //cross domain shit
-    if (url_parts.query.hasOwnProperty('ID')) {
-        scheduleService.GetSchedule(url_parts.query.ID, function(schedule, err) {
+    if (url_parts.query.hasOwnProperty('teamID')) {
+        scheduleService.getSchedule(url_parts.query.teamID, function(err, schedule) {
             if (err) {
                 res.json(new response.ErrorResponse(err));
                 return;
@@ -18,7 +17,7 @@ router.get('/', function(req, res) {
             res.json(new response.ApiResponse(schedule, false, null));
         });
     } else {
-        res.json(new response.ErrorResponse("Team ID was not provided"));
+        res.json(new response.ErrorResponse("teamID was not provided"));
     }
 });
 
@@ -34,16 +33,12 @@ router.post('/surroundingSchedule', function(req, res) {
     var body = {};
     body['teamID'] = req.body.teamID;
     body['date'] = req.body.date;
-    res.setHeader('Access-Control-Allow-Origin', '*'); //cross domain shit
-    res.setHeader('Access-Control-Allow-Headers', 'accept, content-type'); //cross domain shit
-    res.setHeader('Access-Control-Allow-Methods', 'POST');
     if (body.teamID && body.date) {
-        scheduleService.GetSurroundingSchedule(body, function(schedule, err) {
+        scheduleService.getSurroundingSchedule(body, function(err, schedule) {
             if (err) {
                 res.json(new response.ErrorResponse(err));
                 return;
             }
-            console.log(schedule);
             res.json(new response.ApiResponse(schedule, false, null));
         });
     } else {

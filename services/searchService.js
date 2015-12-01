@@ -27,6 +27,6 @@ var searchTeamByID = function(teamID, callback) {
 }
 
 module.exports = {
-    SearchTeam: searchTeam,
+    searchTeam: searchTeam,
     searchTeamByID: searchTeamByID
 }

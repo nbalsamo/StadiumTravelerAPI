@@ -1,4 +1,5 @@
 ﻿var sql = require('mssql');
+﻿var pg = require('pg');
 
 var config = {
     user: 'sa',
@@ -10,6 +11,7 @@ var config = {
         encrypt: false // Use this if you're on Windows Azure 
     }
 }
+var conString = "postgres://postgres:admin@localhost/stadium_traveler";
 
 var executeSimpleQuery = function(query, callback) {
     var connection = new sql.Connection(config, function(err) {
@@ -36,5 +38,6 @@ var executeSelectStoredProcedure = function(storedProcedure, parameters, callbac
 
 module.exports = {
     ExecuteSimpleQuery: executeSimpleQuery,
-    ExecuteSelectStoredProcedure: executeSelectStoredProcedure
+    ExecuteSelectStoredProcedure: executeSelectStoredProcedure,
+    connectionString: conString
 }

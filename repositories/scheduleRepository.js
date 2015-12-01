@@ -1,85 +1,86 @@
-﻿var database = require("../common/database");
-var sql = require('mssql');
-
+var pg = require('pg');﻿
+var database = require("../common/database");
 
 var getSchedule = function(teamID, callback) {
-    var query = 'select * from Schedule where HomeTeamID=' + teamID;
-    database.ExecuteSimpleQuery(query, function(content, err) {
-        var schedule;
-        if (!err) {
-            schedule = buildScheduleFromRaw(content);
+    pg.connect(database.connectionString, function(err, client, done) {
+        if (err) {
+            callback(err);
+            return;
         }
-        console.log(err);
-        callback(schedule, err);
+        client.query('select date from schedules where home_team_id=$1::bigint', [teamID], function(err, result) {
+            done();
+            if (err) {
+                callback(err);
+                return;
+            }
+            var schedule = buildScheduleFromRaw(result.rows);
+            callback(null, schedule);
+        });
     });
 }
 
 var getSurroundingSchedule = function(body, callback) {
-    var parameters = [];
-    var teamIDParameter = {
-        name: "TeamID",
-        type: sql.BigInt,
-        value: body.teamID
-    };
-    var dateParameter = {
-        name: "Date",
-        type: sql.Date,
-        value: body.date
-    };
-    var maximumDistanceParameter = {
-        name: "MaximumDistance",
-        type: sql.BigInt,
-        value: 20
-    };
-
-    parameters.push(teamIDParameter);
-    parameters.push(dateParameter);
-    parameters.push(maximumDistanceParameter);
-
-    database.ExecuteSelectStoredProcedure("usp_SelectSurroundingTeamsByTeamIDAndDate", parameters, function(content, err) {
-        if (!err) {
-            var data = buildSurroundingScheduleFromRaw(content);
+    pg.connect(database.connectionString, function(err, client, done) {
+        if (err) {
+            callback(err);
+            return;
         }
-        callback(data, err);
+        //TODO - make this better
+        client.query('select ' +
+            's.home_team_id as "homeTeamID",' +
+            's.away_team_id as "awayTeamID",' +
+            's.date,' +
+            's.time,' +
+            't2.team_city as "city",' +
+            't2.team_state as "state",' +
+            't2.team_name as "homeTeamName",' +
+            't3.team_name as "awayTeamName",' +
+            'sp.sport_id as "sportID",' +
+            'sp.sport_name as "sportName" ' +
+            'from distances d inner join teams t on d.team_id = t.team_id ' +
+            'inner join schedules s on d.destination_team_id = s.home_team_id ' +
+            'inner join teams t2 on s.home_team_id = t2.team_id ' +
+            'inner join teams t3 on s.away_team_id = t3.team_id ' +
+            'inner join sports sp on sp.sport_id = s.sport_id ' +
+            'where s.date = $1::date ' +
+            'AND t.team_id = $2::bigint ' +
+            'AND d.distance <= 20 ', [body.date, body.teamID],
+            function(err, result) {
+                done();
+                if (err) {
+                    console.log(err);
+                    callback(err);
+                    return;
+                }
+                var data = buildSurroundingScheduleFromRaw(result.rows);
+                callback(null, data);
+            });
     });
 }
 
 var buildScheduleFromRaw = function(scheduleRaw) {
     var schedule = {};
     for (i = 0; i < scheduleRaw.length; i++) {
-        scheduleRaw[i].Date.setDate(scheduleRaw[i].Date.getDate() + 1); //NOT SURE WHY ALL THE DATES ARE ONE BEHIND
-        schedule[scheduleRaw[i].Date.toLocaleDateString("en-US")] = '';
+        schedule[scheduleRaw[i].date.toLocaleDateString("en-US")] = '';
     }
     return schedule;
 }
 
 var buildSurroundingScheduleFromRaw = function(raw) {
-    //not sure why raw is an array with an array inside 
-    //also i have no idea why it thinks the data is not eastern time so maybe i have to convert it to utc and just know that it's eastern
-
-    //Loop through all of the results just to build the response body. This isn't good practice i know 
     var returnObj = {
         'nhlGames': [],
         'mlbGames': [],
         'nbaGames': [],
         'nflGames': []
     }
-    for (var i = 0; i < raw[0].length; i++) {
-        var timeDate = new Date(raw[0][i].Time.toString());
-        raw[0][i].Time = timeDate.toTimeString();
-
-        /*this is fucking dumb*/
-        var date = new Date(raw[0][i].Date.toString());
-        raw[0][i].Date.setDate(date.getDate()).toString();
-        //raw[0][i].Date = raw[0][i].Date.getDate() + 1; //AGAIN NOT SURE WHY ALL OF THE DATES ARE ONE BEHIND
-        //raw[0][i].Date = date
-
-        switch (raw[0][i].SportID) {
+    for (var i = 0; i < raw.length; i++) {
+        //TODO - user moment to fix the fucking date
+        switch (raw[i].sportID) {
             case "1":
-                returnObj.nhlGames.push(raw[0][i]);
+                returnObj.nhlGames.push(raw[i]);
                 break;
             case "2":
-                returnObj.nbaGames.push(raw[0][i]);
+                returnObj.nbaGames.push(raw[i]);
                 break;
             case "3":
                 returnObj.nflGames.push(raw[0][i]);
@@ -95,6 +96,6 @@ var buildSurroundingScheduleFromRaw = function(raw) {
 }
 
 module.exports = {
-    GetSchedule: getSchedule,
-    GetSurroundingSchedule: getSurroundingSchedule
+    getSchedule: getSchedule,
+    getSurroundingSchedule: getSurroundingSchedule
 }
