@@ -9,7 +9,7 @@ var getSchedule = function(req, res, next) {
             if (err) {
                 return next(err);
             }
-            res.json(new response.ApiResponse(schedule, false, null));
+            res.json(schedule);
         });
     } else {
         var err = {

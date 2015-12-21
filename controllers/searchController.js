@@ -9,11 +9,7 @@ var searchTeam = function(req, res, next) {
     if (url_parts.query.hasOwnProperty('q')) {
         searchRepository.searchTeam(url_parts.query.q, function(err, content) {
             if (err) return next(err);
-            if (content.length > 0) {
-                res.json(new response.ApiResponse(content[0], false, null));
-            } else {
-                res.json(new response.ApiResponse(content, false, null));
-            }
+            res.json(content);
         });
     } else {
         var err = {
@@ -30,11 +26,7 @@ var searchTeamByID = function(req, res, next) {
     if (url_parts.query.hasOwnProperty('id')) {
         searchRepository.searchTeamByID(url_parts.query.id, function(err, content) {
             if (err) return next(err);
-            if (content.length > 0) {
-                res.json(new response.ApiResponse(content[0], false, null));
-            } else {
-                res.json(new response.ApiResponse(content, false, null));
-            }
+            res.json(content);
         });
     } else {
         var err = {

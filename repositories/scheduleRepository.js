@@ -4,17 +4,15 @@ var database = require("../common/database");
 var getSchedule = function(teamID, callback) {
     pg.connect(database.connectionString, function(err, client, done) {
         if (err) {
-            callback(err);
-            return;
+            return callback(err);
         }
         client.query('select date from schedules where home_team_id=$1::bigint', [teamID], function(err, result) {
             done();
             if (err) {
-                callback(err);
-                return;
+                return callback(err);
             }
             var schedule = buildScheduleFromRaw(result.rows);
-            callback(null, schedule);
+            return callback(null, schedule);
         });
     });
 }
@@ -22,8 +20,7 @@ var getSchedule = function(teamID, callback) {
 var getSurroundingSchedule = function(body, callback) {
     pg.connect(database.connectionString, function(err, client, done) {
         if (err) {
-            callback(err);
-            return;
+            return callback(err);
         }
         //TODO - make this better
         client.query('select ' +
@@ -48,12 +45,10 @@ var getSurroundingSchedule = function(body, callback) {
             function(err, result) {
                 done();
                 if (err) {
-                    console.log(err);
-                    callback(err);
-                    return;
+                    return callback(err);
                 }
                 var data = buildSurroundingScheduleFromRaw(result.rows);
-                callback(null, data);
+                return callback(null, data);
             });
     });
 }
