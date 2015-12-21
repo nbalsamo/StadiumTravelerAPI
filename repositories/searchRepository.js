@@ -38,7 +38,31 @@ var searchTeamByID = function(teamID, callback) {
     });
 }
 
+var getAllTeams = function(callback) {
+    pg.connect(database.connectionString, function(err, client, done) {
+        if (err) {
+            return callback(err);
+        }
+        client.query('select team_name as "teamName" from teams', function(err, result) {
+            done();
+            if (err) {
+                return callback(err);
+            }
+            return callback(null, convertRawGetAllTeams(result.rows));
+        });
+    });
+}
+
+var convertRawGetAllTeams = function(data) {
+    var teamNames = [];
+    for (var i = 0; i < data.length; i++) {
+        teamNames.push(data[i].teamName);
+    }
+    return teamNames;
+}
+
 module.exports = {
     searchTeam: searchTeam,
-    searchTeamByID: searchTeamByID
+    searchTeamByID: searchTeamByID,
+    getAllTeams: getAllTeams
 }

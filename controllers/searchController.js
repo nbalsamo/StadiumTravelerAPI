@@ -37,7 +37,16 @@ var searchTeamByID = function(req, res, next) {
     }
 }
 
+/*Return a list of all teams*/
+var getAllTeams = function(req, res, next) {
+    searchRepository.getAllTeams(function(err, content) {
+        if (err) return next(err);
+        res.json(content);
+    });
+}
+
 module.exports = {
     searchTeam: searchTeam,
-    searchTeamByID: searchTeamByID
+    searchTeamByID: searchTeamByID,
+    getAllTeams: getAllTeams
 }

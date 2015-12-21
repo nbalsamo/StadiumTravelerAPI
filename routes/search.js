@@ -12,4 +12,8 @@ router.get('/', searchController.searchTeam);
  */
 router.get('/team/', searchController.searchTeamByID);
 
+/* Search for a master list of all teams*
+ */
+router.get('/teams/', searchController.getAllTeams);
+
 module.exports = router;
