@@ -1,3 +1,5 @@
+#this kind of works. The CSV file is not quite formatted correctly and required changes. 
+
 import requests
 import csv
 from bs4 import BeautifulSoup

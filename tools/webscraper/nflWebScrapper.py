@@ -1,3 +1,5 @@
+# I dont actually do anything with this file
+
 import requests
 import csv
 from bs4 import BeautifulSoup

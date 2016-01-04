@@ -1,3 +1,5 @@
+//Simple node script that replaces team names with the ids I have set up in the system. This shouldn't be a seperate script from the nfl version.
+
 var fs = require('fs')
 
 var nhlTeams = {
