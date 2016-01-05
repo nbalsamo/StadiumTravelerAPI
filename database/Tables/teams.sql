@@ -132,7 +132,7 @@ insert into teams (team_name, team_city, team_state, stadium_name, position, spo
 insert into teams (team_name, team_city, team_state, stadium_name, position, sport_id) values ('Los Angeles Dodgers','Los Angeles','CA','Dodger Stadium','34.07361111°N 118.24°W',4);
 insert into teams (team_name, team_city, team_state, stadium_name, position, sport_id) values ('San Diego Padres','San Diego','CA','Petco Park','32.70722222°N 117.1566667°W',4);
 insert into teams (team_name, team_city, team_state, stadium_name, position, sport_id) values ('San Francisco Giants','San Francisco','CA','AT&T Park','37.77861111°N 122.3891667°W',4);
-insert into teams (team_name, team_city, team_state, stadium_name, position, sport_id) values ('Houston Astros','Houston','TX','Minute Maid Park','29.7569° N, 95.3556° W',4);
+insert into teams (team_name, team_city, team_state, stadium_name, position, sport_id) values ('Houston Astros','Houston','TX','Minute Maid Park','29.7569° N 95.3556° W',4);
 --NCAAF
 INSERT INTO teams (team_name, team_city, team_state, stadium_name,  position, sport_id) values ('Air Force','Colorado Springs','Colorado','Falcon Stadium','38.9969444444444 N 104.842222222222 W',5);
 INSERT INTO teams (team_name, team_city, team_state, stadium_name,  position, sport_id) values ('Akron','Akron','Ohio','Summa Field at InfoCision Stadium','41.072347 N 81.508019 W',5);
@@ -173,7 +173,6 @@ INSERT INTO teams (team_name, team_city, team_state, stadium_name,  position, sp
 INSERT INTO teams (team_name, team_city, team_state, stadium_name,  position, sport_id) values ('Georgia Southern','Statesboro','Georgia','Paulson Stadium','32.4122222222222 N 81.7830555555555 W',5);
 INSERT INTO teams (team_name, team_city, team_state, stadium_name,  position, sport_id) values ('Georgia State','Atlanta','Georgia','Georgia Dome','33.7575 N 84.4008333333333 W',5);
 INSERT INTO teams (team_name, team_city, team_state, stadium_name,  position, sport_id) values ('Georgia Tech','Atlanta','Georgia','Bobby Dodd Stadium at Historic Grant Field','33.7725 N 84.3927777777778 W',5);
-INSERT INTO teams (team_name, team_city, team_state, stadium_name,  position, sport_id) values ('Hawaii','Honolulu','Hawaii','Aloha Stadium','21.3727777777778 N 157.93 W',5);
 INSERT INTO teams (team_name, team_city, team_state, stadium_name,  position, sport_id) values ('Houston','Houston','Texas','John O Quinn Field at TDECU Stadium','29.7219444444444 N 95.3491666666667 W',5);
 INSERT INTO teams (team_name, team_city, team_state, stadium_name,  position, sport_id) values ('Idaho','Moscow','Idaho','Kibbie Dome','46.7261111111111 N 117.016944444444 W',5);
 INSERT INTO teams (team_name, team_city, team_state, stadium_name,  position, sport_id) values ('Illinois','Urbana-Champaign','Illinois','Memorial Stadium','40.0991666666667 N 88.2358333333333 W',5);
@@ -261,5 +260,5 @@ INSERT INTO teams (team_name, team_city, team_state, stadium_name,  position, sp
 INSERT INTO teams (team_name, team_city, team_state, stadium_name,  position, sport_id) values ('Western Kentucky','Bowling Green','Kentucky','Houchens Industries–L. T. Smith Stadium','36.9847222222222 N 86.4594444444444 W',5);
 INSERT INTO teams (team_name, team_city, team_state, stadium_name,  position, sport_id) values ('Western Michigan','Kalamazoo','Michigan','Waldo Stadium','42.2858333333333 N 85.6011111111111 W',5);
 INSERT INTO teams (team_name, team_city, team_state, stadium_name,  position, sport_id) values ('Wisconsin','Madison','Wisconsin','Camp Randall Stadium','43.07 N 89.4127777777778 W',5);
-INSERT INTO teams (team_name, team_city, team_state, stadium_name,  position, sport_id) values ('Wyoming','Laramie','Wyoming','War Memorial Stadium','41.312 N, 105.568 W',5);
+INSERT INTO teams (team_name, team_city, team_state, stadium_name,  position, sport_id) values ('Wyoming','Laramie','Wyoming','War Memorial Stadium','41.312 N 105.568 W',5);
 
