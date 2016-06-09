@@ -10,10 +10,7 @@ router.get('/', teamController.searchTeam);
 /* Search for a team by team id *
  * Query string ?id={teamID}
  */
-router.get('/team/', teamController.searchTeamByID);
+router.get('/:teamID([0-9]+)', teamController.getTeamByID);
 
-/* Search for a master list of all teams*
- */
-router.get('/teams/', teamController.getAllTeams);
 
 module.exports = router;

@@ -1,4 +1,6 @@
-﻿var database = require("../common/database");
+﻿'use strict';
+
+var database = require('../common/database');
 var pg = require('pg');
 
 var searchTeam = function(teamName, callback) {
@@ -17,7 +19,7 @@ var searchTeam = function(teamName, callback) {
             return callback(null, null);
         });
     });
-}
+};
 
 var searchTeamByID = function(teamID, callback) {
     pg.connect(database.connectionString, function(err, client, done) {
@@ -25,6 +27,7 @@ var searchTeamByID = function(teamID, callback) {
             callback(err);
             return;
         }
+
         client.query('select team_id as "teamID", team_name as "teamName", team_city as "teamCity", stadium_name as "stadiumName", position, sport_id as "sportID" from teams where team_id=$1::bigint', [teamID], function(err, result) {
             done();
             if (err) {
@@ -36,7 +39,7 @@ var searchTeamByID = function(teamID, callback) {
             return callback('Invalid Team ID'); //TODO - this will result in a 500. It should be returning a 400
         });
     });
-}
+};
 
 var getAllTeams = function(callback) {
     pg.connect(database.connectionString, function(err, client, done) {
@@ -51,7 +54,7 @@ var getAllTeams = function(callback) {
             return callback(null, convertRawGetAllTeams(result.rows));
         });
     });
-}
+};
 
 var convertRawGetAllTeams = function(data) {
     var teamNames = [];
@@ -59,10 +62,10 @@ var convertRawGetAllTeams = function(data) {
         teamNames.push(data[i].teamName);
     }
     return teamNames;
-}
+};
 
 module.exports = {
     searchTeam: searchTeam,
     searchTeamByID: searchTeamByID,
     getAllTeams: getAllTeams
-}
+};

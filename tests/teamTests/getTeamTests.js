@@ -3,7 +3,7 @@
 var assert = require('chai').assert;
 var request = require('supertest');
 
-describe('GET /teams - Seach Teams', function() {
+describe('GET /teams/{teamID} -  Get team by ID', function() {
     var app;
 
     before(function(done) {
@@ -12,18 +12,18 @@ describe('GET /teams - Seach Teams', function() {
     });
 
 
-    function sendRequest(query) {
+    function sendRequest(teamID) {
         return request(app)
-            .get('/teams?q=' + query)
+            .get('/teams/' + teamID)
             .send();
     }
 
-    it('returns 200 and team data for team search', function(done) {
-        sendRequest('New Jersey Devils')
+    it('returns 200 and team data for get team by team id', function(done) {
+        sendRequest(11)
             .end(function(err, res) {
                 if (err) return done(err);
+
                 assert.equal(res.status, 200);
-                assert.equal(res.body.teamID, 11);
                 assert.equal(res.body.teamName, 'New Jersey Devils');
                 assert.equal(res.body.teamCity, 'Newark');
                 assert.equal(res.body.stadiumName, 'Prudential Center');
@@ -34,14 +34,8 @@ describe('GET /teams - Seach Teams', function() {
             });
     });
 
-    it('returns nothing for invalid team name', function(done) {
+    it('returns 404 for non number team id', function(done) {
         sendRequest('blah')
-            .end(function(err, res) {
-                if (err) return done(err);
-                assert.equal(res.status, 200);
-                assert.notOk(res.body);
-
-                done();
-            });
+            .expect(404, done);
     });
 });
