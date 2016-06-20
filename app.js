@@ -1,6 +1,6 @@
 'use strict';
 
-var app = require('../server')(true);
+var app = require('./server')(true);
 
 app.set('port', process.env.PORT || 3000);
 
