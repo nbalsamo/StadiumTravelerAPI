@@ -1,21 +1,25 @@
-var pg = require('pg');﻿
-var database = require("../common/database");
+'use strict';
 
-var getSchedule = function(teamID, callback) {
-    pg.connect(database.connectionString, function(err, client, done) {
-        if (err) {
-            return callback(err);
-        }
-        client.query('select date from schedules where home_team_id=$1::bigint', [teamID], function(err, result) {
-            done();
+var pg = require('pg');
+var database = require('../common/database');
+
+var getSchedule = function(teamID) {
+    return new Promise(function(resolve, reject) {
+        pg.connect(database.connectionString, function(err, client, done) {
             if (err) {
-                return callback(err);
+                return reject(err);
             }
-            var schedule = buildScheduleFromRaw(result.rows);
-            return callback(null, schedule);
+            client.query('select date from schedules where home_team_id=$1::bigint', [teamID], function(err, result) {
+                done();
+                if (err) {
+                    return reject(err);
+                }
+                var schedule = buildScheduleFromRaw(result.rows);
+                return resolve(schedule);
+            });
         });
     });
-}
+};
 
 var getSurroundingSchedule = function(body, callback) {
     pg.connect(database.connectionString, function(err, client, done) {
@@ -51,15 +55,15 @@ var getSurroundingSchedule = function(body, callback) {
                 return callback(null, data);
             });
     });
-}
+};
 
 var buildScheduleFromRaw = function(scheduleRaw) {
     var schedule = {};
-    for (i = 0; i < scheduleRaw.length; i++) {
-        schedule[scheduleRaw[i].date.toLocaleDateString("en-US")] = '';
+    for (var i = 0; i < scheduleRaw.length; i++) {
+        schedule[scheduleRaw[i].date.toLocaleDateString('en-US')] = '';
     }
     return schedule;
-}
+};
 
 var buildSurroundingScheduleFromRaw = function(raw) {
     var returnObj = {
@@ -88,9 +92,9 @@ var buildSurroundingScheduleFromRaw = function(raw) {
         }
     }
     return returnObj;
-}
+};
 
 module.exports = {
     getSchedule: getSchedule,
     getSurroundingSchedule: getSurroundingSchedule
-}
+};

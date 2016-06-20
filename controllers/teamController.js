@@ -1,6 +1,8 @@
 ﻿'use strict';
 
 var teamRepository = require('../repositories/teamRepository.js')();
+var scheduleRepository = require('../repositories/scheduleRepository');
+
 var url = require('url');
 
 
@@ -30,6 +32,15 @@ module.exports = function teamController() {
         /*Search for a team using teamID*/
         getTeamByID: function(req, res, next) {
             teamRepository.searchTeamByID(req.params.teamID)
+                .then(function(content) {
+                    res.json(content);
+                }).catch(function(err) {
+                    return next(err);
+                });
+        },
+
+        getSchedule: function(req, res, next) {
+            scheduleRepository.getSchedule(req.params.teamID)
                 .then(function(content) {
                     res.json(content);
                 }).catch(function(err) {

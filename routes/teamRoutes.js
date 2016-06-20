@@ -9,10 +9,15 @@ var router = express.Router();
  */
 router.get('/', teamController.searchTeam);
 
-/* Search for a team by team id *
- * Query string ?id={teamID}
- */
+/* 
+Get a team by ID
+*/
 router.get('/:teamID([0-9]+)', teamController.getTeamByID);
 
+
+/*
+Get a teams schedule by ID
+*/
+router.get('/:teamID([0-9]+)/schedule', teamController.getSchedule);
 
 module.exports = router;
