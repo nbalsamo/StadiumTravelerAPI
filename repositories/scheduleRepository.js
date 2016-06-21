@@ -9,14 +9,24 @@ var getSchedule = function(teamID) {
             if (err) {
                 return reject(err);
             }
-            client.query('select date from schedules where home_team_id=$1::bigint', [teamID], function(err, result) {
-                done();
-                if (err) {
-                    return reject(err);
-                }
-                var schedule = buildScheduleFromRaw(result.rows);
-                return resolve(schedule);
-            });
+            client.query('SELECT t.team_name, s.date, s.time, 1 AS home ' +
+                'FROM teams t JOIN schedules s ON (t.team_id = s.away_team_id) ' +
+                'WHERE home_team_id=$1::bigint ' +
+                'UNION ALL ' +
+                'SELECT t.team_name, s.date, s.time, 0 AS home ' +
+                'FROM teams t JOIN schedules s ON (t.team_id = s.home_team_id) ' +
+                'WHERE away_team_id=$1::bigint ' +
+                'ORDER BY date', [teamID],
+
+                function(err, result) {
+                    done();
+                    if (err) {
+                        return reject(err);
+                    }
+
+                    var data = result.rows.map(buildScheduleFromRaw);
+                    return resolve(data);
+                });
         });
     });
 };
@@ -57,12 +67,14 @@ var getSurroundingSchedule = function(body, callback) {
     });
 };
 
-var buildScheduleFromRaw = function(scheduleRaw) {
-    var schedule = {};
-    for (var i = 0; i < scheduleRaw.length; i++) {
-        schedule[scheduleRaw[i].date.toLocaleDateString('en-US')] = '';
-    }
-    return schedule;
+var buildScheduleFromRaw = function(row) {
+    var game = {
+        opponent: row.team_name,
+        time: row.time,
+        date: new Date(row.date).toLocaleDateString('en-US'),
+        isHome: row.home
+    };
+    return game;
 };
 
 var buildSurroundingScheduleFromRaw = function(raw) {

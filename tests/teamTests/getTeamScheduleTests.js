@@ -1,6 +1,8 @@
 'use strict';
 
 var request = require('supertest');
+var assert = require('chai').assert;
+
 describe('GET teams/{teamID}/schedule - GET a Team\'s Schedule', function() {
     var app;
 
@@ -20,7 +22,13 @@ describe('GET teams/{teamID}/schedule - GET a Team\'s Schedule', function() {
             .end(function(err, res) {
                 if (err) return done(err);
 
-                console.log(res.body);
+                assert.equal(res.body.length, 129);
+
+                //just testing the body is set correctly - not checking data integrity yet
+                assert.ok(res.body[0].opponent);
+                assert.ok(res.body[0].time);
+                assert.ok(res.body[0].date);
+                assert.equal(res.body[0].isHome, 0);
 
                 done();
             });
