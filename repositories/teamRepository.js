@@ -4,6 +4,8 @@ var database = require('../common/database');
 var pg = require('pg');
 
 module.exports = function() {
+    var selectTeamSql = 'select team_id as "teamID", team_name as "teamName", team_city as "teamCity", stadium_name as "stadiumName", position, sport_id as "sportID" ';
+
     return {
         searchTeam: function(teamName) {
             return new Promise(function(resolve, reject) {
@@ -11,7 +13,7 @@ module.exports = function() {
                     if (err) {
                         return reject(err);
                     }
-                    client.query('select team_id as "teamID", team_name as "teamName", team_city as "teamCity", stadium_name as "stadiumName", position, sport_id as "sportID" from teams where team_name=$1::text', [teamName], function(err, result) {
+                    client.query(selectTeamSql + ' from teams where team_name=$1::text', [teamName], function(err, result) {
                         done();
                         if (err) {
                             return reject(err);
@@ -31,7 +33,7 @@ module.exports = function() {
                     if (err) {
                         return reject(err);
                     }
-                    client.query('select team_id as "teamID", team_name as "teamName", team_city as "teamCity", stadium_name as "stadiumName", position, sport_id as "sportID" from teams where team_id=$1::bigint', [teamID], function(err, result) {
+                    client.query(selectTeamSql + 'from teams where team_id=$1::bigint', [teamID], function(err, result) {
                         done();
                         if (err) {
                             return reject(err);
@@ -51,26 +53,16 @@ module.exports = function() {
                     if (err) {
                         return reject(err);
                     }
-                    client.query('select team_name as "teamName" from teams', function(err, result) {
+                    client.query(selectTeamSql + ' from teams', function(err, result) {
                         done();
                         if (err) {
                             return reject(err);
                         }
 
-                        var data = convertRawGetAllTeams(result.rows);
-                        return resolve(data);
+                        return resolve(result.rows);
                     });
                 });
             });
         }
     };
-};
-
-
-var convertRawGetAllTeams = function(data) {
-    var teamNames = [];
-    for (var i = 0; i < data.length; i++) {
-        teamNames.push(data[i].teamName);
-    }
-    return teamNames;
 };
