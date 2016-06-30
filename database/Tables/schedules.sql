@@ -5,7 +5,10 @@ CREATE TABLE schedules (
     sport_id bigint references sports (sport_id),
     date date  not null,
     time time not null
-);;
+);
+
+CREATE INDEX IF NOT EXISTS ix_schedules_date_home_team_id ON schedules (date, home_team_id);
+
 
 insert into schedules (away_team_id, home_team_id, date, time, sport_id) values (5,8,'10/8/2014','7:00:00',1);
 insert into schedules (away_team_id, home_team_id, date, time, sport_id) values (14,1,'10/8/2014','7:30:00',1);

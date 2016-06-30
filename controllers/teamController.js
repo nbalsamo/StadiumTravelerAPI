@@ -46,6 +46,16 @@ module.exports = function teamController() {
                 }).catch(function(err) {
                     return next(err);
                 });
+        },
+
+        getSurroundingSchedule: function(req, res, next) {
+            if (!req.query.date || !req.query.distance) return next('missing fields');
+            teamRepository.getSurroundingSchedule(req.params.teamID, req.query.date, req.query.distance)
+                .then(function(content) {
+                    res.json(content);
+                }).catch(function(err) {
+                    return next(err);
+                });
         }
     };
 

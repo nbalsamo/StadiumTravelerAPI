@@ -20,4 +20,12 @@ Get a teams schedule by ID
 */
 router.get('/:teamID([0-9]+)/schedule', teamController.getSchedule);
 
+
+/*
+Get surrounding games by a teamid
+*/
+router.get('/:teamID([0-9]+)/surrounding', teamController.getSurroundingSchedule);
+
+
+
 module.exports = router;
