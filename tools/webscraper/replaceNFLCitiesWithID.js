@@ -1,152 +1,56 @@
 //Simple node script that replaces team names with the ids I have set up in the system. This shouldn't be a seperate script from the nhl version. 
 
-var fs = require('fs')
+var fs = require('fs');
 
 var nflTeams = {
-    "Bills": {
-        id: 61,
-        name: "Bills"
-    },
-    "Dolphins": {
-        id: 62,
-        name: "Dolphins"
-    },
-    "Patriots": {
-        id: 63,
-        name: "Patriots"
-    },
-    "Jets": {
-        id: 64,
-        name: "Jets"
-    },
-    "Ravens": {
-        id: 65,
-        name: "Ravens"
-    },
-    "Bengals": {
-        id: 66,
-        name: "Bengals"
-    },
-    "Browns": {
-        id: 67,
-        name: "Browns"
-    },
-    "Steelers": {
-        id: 68,
-        name: "Steelers"
-    },
-    "Texans": {
-        id: 69,
-        name: "Texans"
-    },
-    "Colts": {
-        id: 70,
-        name: "Colts"
-    },
-    "Jaguars": {
-        id: 71,
-        name: "Jaguars"
-    },
-    "Titans": {
-        id: 72,
-        name: "Titans"
-    },
-    "Broncos": {
-        id: 73,
-        name: "Broncos"
-    },
-    "Chiefs": {
-        id: 74,
-        name: "Chiefs"
-    },
-    "Raiders": {
-        id: 75,
-        name: "Raiders"
-    },
-    "Chargers": {
-        id: 76,
-        name: "Chargers"
-    },
-    "Cowboys": {
-        id: 77,
-        name: "Cowboys"
-    },
-    "Giants": {
-        id: 78,
-        name: "Giants"
-    },
-    "Eagles": {
-        id: 79,
-        name: "Eagles"
-    },
-    "Redskins": {
-        id: 80,
-        name: "Redskins"
-    },
-    "Bears": {
-        id: 81,
-        name: "Bears"
-    },
-    "Lions": {
-        id: 82,
-        name: "Lions"
-    },
-    "Packers": {
-        id: 83,
-        name: "Packers"
-    },
-    "Vikings": {
-        id: 84,
-        name: "Vikings"
-    },
-    "Falcons": {
-        id: 85,
-        name: "Falcons"
-    },
-    "Panthers": {
-        id: 86,
-        name: "Panthers"
-    },
-    "Saints": {
-        id: 87,
-        name: "Saints"
-    },
-    "Buccaneers": {
-        id: 88,
-        name: "Buccaneers"
-    },
-    "Cardinals": {
-        id: 89,
-        name: "Cardinals"
-    },
-    "Rams": {
-        id: 90,
-        name: "Rams"
-    },
-    "49ers": {
-        id: 91,
-        name: "49ers"
-    },
-    "Seahawks": {
-        id: 92,
-        name: "Seahawks"
-    },
+    "Buffalo Bills": { "name": "Buffalo Bills", "teamID": 61 },
+    "Miami Dolphins": { "name": "Miami Dolphins", "teamID": 62 },
+    "New England Patriots": { "name": "New England Patriots", "teamID": 63 },
+    "New York Jets": { "name": "New York Jets", "teamID": 64 },
+    "Baltimore Ravens": { "name": "Baltimore Ravens", "teamID": 65 },
+    "Cincinnati Bengals": { "name": "Cincinnati Bengals", "teamID": 66 },
+    "Cleveland Browns": { "name": "Cleveland Browns", "teamID": 67 },
+    "Pittsburgh Steelers": { "name": "Pittsburgh Steelers", "teamID": 68 },
+    "Houston Texans": { "name": "Houston Texans", "teamID": 69 },
+    "Indianapolis Colts": { "name": "Indianapolis Colts", "teamID": 70 },
+    "Jacksonville Jaguars": { "name": "Jacksonville Jaguars", "teamID": 71 },
+    "Tennessee Titans": { "name": "Tennessee Titans", "teamID": 72 },
+    "Denver Broncos": { "name": "Denver Broncos", "teamID": 73 },
+    "Kansas City Chiefs": { "name": "Kansas City Chiefs", "teamID": 74 },
+    "Oakland Raiders": { "name": "Oakland Raiders", "teamID": 75 },
+    "San Diego Chargers": { "name": "San Diego Chargers", "teamID": 76 },
+    "Dallas Cowboys": { "name": "Dallas Cowboys", "teamID": 77 },
+    "New York Giants": { "name": "New York Giants", "teamID": 78 },
+    "Philadelphia Eagles": { "name": "Philadelphia Eagles", "teamID": 79 },
+    "Washington Redskins": { "name": "Washington Redskins", "teamID": 80 },
+    "Chicago Bears": { "name": "Chicago Bears", "teamID": 81 },
+    "Detroit Lions": { "name": "Detroit Lions", "teamID": 82 },
+    "Green Bay Packers": { "name": "Green Bay Packers", "teamID": 83 },
+    "Minnesota Vikings": { "name": "Minnesota Vikings", "teamID": 84 },
+    "Atlanta Falcons": { "name": "Atlanta Falcons", "teamID": 85 },
+    "Carolina Panthers": { "name": "Carolina Panthers", "teamID": 86 },
+    "New Orleans Saints": { "name": "New Orleans Saints", "teamID": 87 },
+    "Tampa Bay Buccaneers": { "name": "Tampa Bay Buccaneers", "teamID": 88 },
+    "Arizona Cardinals": { "name": "Arizona Cardinals", "teamID": 89 },
+    "Los Angeles Rams": { "name": "Los Angeles Rams", "teamID": 90 },
+    "San Francisco 49ers": { "name": "San Francisco 49ers", "teamID": 91 },
+    "Seattle Seahawks": { "name": "Seattle Seahawks", "teamID": 92 }
+
 }
 
 
-fs.readFile('C:\\Users\\nbalsamo\\Desktop\\nfl-2015-schedule.csv', 'utf8', function(err, data) {
+fs.readFile('F:\\Users\\nbalsamo\\Desktop\\nfl-2016.csv', 'utf8', function(err, data) {
     if (err) {
         return console.log(err);
     }
     result = data;
 
     Object.keys(nflTeams).forEach(function(key) {
-        var val = nflTeams[key];
-        var re = new RegExp(nflTeams[key].name, "g");
-        result = result.replace(re, nflTeams[key].id);
+        var re = new RegExp(nflTeams[key].name, 'g');
+        result = result.replace(re, nflTeams[key].teamID);
     });
 
-    fs.writeFile('C:\\Users\\nbalsamo\\Desktop\\nfl-2015-scheduleEdited.csv', result, 'utf8', function(err) {
+    fs.writeFile('F:\\Users\\nbalsamo\\Desktop\\nfl-2016-scheduleEdited.csv', result, 'utf8', function(err) {
         if (err) return console.log(err);
     });
 });
