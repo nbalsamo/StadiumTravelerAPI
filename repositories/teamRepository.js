@@ -80,9 +80,9 @@ module.exports = function() {
                         'home.team_state as "homeTeamState",' +
                         'home.stadium_name as "homeStadiumName",' +
                         'home.position as "homePosition", ' +
-                        'home.team_name as "homeTeamName", ' +
+                        'home.team_name as "homeTeam", ' +
                         'away.team_id as "awayTeamID", ' +
-                        'away.team_name as "awayTeamName",' +
+                        'away.team_name as "awayTeam",' +
                         's.sport_id as "sportID", ' +
                         's.time, ' +
                         's.date,' +

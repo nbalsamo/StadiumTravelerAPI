@@ -40,7 +40,7 @@ module.exports = function teamController() {
         },
 
         getSchedule: function(req, res, next) {
-            scheduleRepository.getSchedule(req.params.teamID)
+            scheduleRepository.getSchedule(req.params.teamID, req.query.filter)
                 .then(function(content) {
                     res.json(content);
                 }).catch(function(err) {

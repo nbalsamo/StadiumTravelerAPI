@@ -2,22 +2,38 @@
 
 var pg = require('pg');
 var database = require('../common/database');
+var scheduleFilter = require('../enum/scheduleFilter');
 
-var getSchedule = function(teamID) {
+var getSchedule = function(teamID, filter) {
     return new Promise(function(resolve, reject) {
         pg.connect(database.connectionString, function(err, client, done) {
             if (err) {
                 return reject(err);
             }
-            client.query('SELECT t.team_name, s.date, s.time, 1 AS home ' +
-                'FROM teams t JOIN schedules s ON (t.team_id = s.away_team_id) ' +
-                'WHERE home_team_id=$1::bigint ' +
-                'UNION ALL ' +
-                'SELECT t.team_name, s.date, s.time, 0 AS home ' +
-                'FROM teams t JOIN schedules s ON (t.team_id = s.home_team_id) ' +
-                'WHERE away_team_id=$1::bigint ' +
-                'ORDER BY date', [teamID],
 
+            var homeSQL = 'SELECT away.team_name as away_team, home.team_name as home_team, s.date, s.time, 1 AS home ' +
+                'FROM teams away ' +
+                'INNER JOIN schedules s ON (away.team_id = s.away_team_id) ' +
+                'INNER JOIN teams home ON (home.team_id = s.home_team_id) ' +
+                'WHERE s.home_team_id=$1::bigint ';
+
+            var awaySQL = 'SELECT away.team_name as away_team, home.team_name as home_team, s.date, s.time, 0 AS home ' +
+                'FROM teams home ' +
+                'INNER JOIN schedules s ON (home.team_id = s.home_team_id) ' +
+                'INNER JOIN teams away ON (away.team_id = s.away_team_id) ' +
+                'WHERE s.away_team_id=$1::bigint ';
+
+            var sql = '';
+
+            if (filter == scheduleFilter.HOME) {
+                sql = homeSQL + 'ORDER BY date';
+            } else if (filter == scheduleFilter.AWAY) {
+                sql = awaySQL + 'ORDER BY date';
+            } else {
+                sql = homeSQL + 'UNION ALL ' + awaySQL + 'ORDER BY date';
+            }
+
+            client.query(sql, [teamID],
                 function(err, result) {
                     done();
                     if (err) {
@@ -31,45 +47,10 @@ var getSchedule = function(teamID) {
     });
 };
 
-var getSurroundingSchedule = function(body, callback) {
-    pg.connect(database.connectionString, function(err, client, done) {
-        if (err) {
-            return callback(err);
-        }
-        //TODO - make this better
-        client.query('select ' +
-            's.home_team_id as "homeTeamID",' +
-            's.away_team_id as "awayTeamID",' +
-            's.date,' +
-            's.time,' +
-            't2.team_city as "city",' +
-            't2.team_state as "state",' +
-            't2.team_name as "homeTeamName",' +
-            't3.team_name as "awayTeamName",' +
-            'sp.sport_id as "sportID",' +
-            'sp.sport_name as "sportName" ' +
-            'from distances d inner join teams t on d.team_id = t.team_id ' +
-            'inner join schedules s on d.destination_team_id = s.home_team_id ' +
-            'inner join teams t2 on s.home_team_id = t2.team_id ' +
-            'inner join teams t3 on s.away_team_id = t3.team_id ' +
-            'inner join sports sp on sp.sport_id = s.sport_id ' +
-            'where s.date = $1::date ' +
-            'AND t.team_id = $2::bigint ' +
-            'AND d.distance <= 20 ', [body.date, body.teamID],
-            function(err, result) {
-                done();
-                if (err) {
-                    return callback(err);
-                }
-                var data = buildSurroundingScheduleFromRaw(result.rows);
-                return callback(null, data);
-            });
-    });
-};
-
 var buildScheduleFromRaw = function(row) {
     var game = {
-        opponent: row.team_name,
+        awayTeam: row.away_team,
+        homeTeam: row.home_team,
         time: row.time,
         date: new Date(row.date).toLocaleDateString('en-US'),
         isHome: row.home
@@ -77,36 +58,6 @@ var buildScheduleFromRaw = function(row) {
     return game;
 };
 
-var buildSurroundingScheduleFromRaw = function(raw) {
-    var returnObj = {
-        'nhlGames': [],
-        'mlbGames': [],
-        'nbaGames': [],
-        'nflGames': []
-    }
-    for (var i = 0; i < raw.length; i++) {
-        //TODO - user moment to fix the fucking date
-        switch (raw[i].sportID) {
-            case "1":
-                returnObj.nhlGames.push(raw[i]);
-                break;
-            case "2":
-                returnObj.nbaGames.push(raw[i]);
-                break;
-            case "3":
-                returnObj.nflGames.push(raw[0][i]);
-                break;
-            case "4":
-                returnObj.mlbGames.push(raw[0][i]);
-                break;
-            default:
-                console.log("wtf sport is this????");
-        }
-    }
-    return returnObj;
-};
-
 module.exports = {
-    getSchedule: getSchedule,
-    getSurroundingSchedule: getSurroundingSchedule
+    getSchedule: getSchedule
 };
