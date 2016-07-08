@@ -2,6 +2,7 @@
 
 var database = require('../common/database');
 var pg = require('pg');
+var _ = require('lodash');
 
 module.exports = function() {
     var selectTeamSql = 'select team_id as "teamID", team_name as "teamName", team_city as "teamCity", stadium_name as "stadiumName", position, sport_id as "sportID" ';
@@ -100,11 +101,32 @@ module.exports = function() {
                         if (err) {
                             return reject(err);
                         }
-                        return resolve(result.rows);
+                        return resolve(buildSurroundingSchedule(result.rows));
 
                     });
                 });
             });
         }
     };
+
+    function buildSurroundingSchedule(rows) {
+        var games = {};
+        games.nhl = _.filter(rows, function(o) {
+            return o.sportID == 1;
+        });
+        games.nba = _.filter(rows, function(o) {
+            return o.sportID == 2;
+        });
+        games.nfl = _.filter(rows, function(o) {
+            return o.sportID == 3;
+        });
+        games.mlb = _.filter(rows, function(o) {
+            return o.sportID == 4;
+        });
+        games.ncaaf = _.filter(rows, function(o) {
+            return o.sportID == 5;
+        });
+
+        return games;
+    }
 };

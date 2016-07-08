@@ -23,19 +23,19 @@ describe('GET /teams/{teamID}/surrounding -  Get teams surrounding schedule by I
             .end(function(err, res) {
                 if (err) return done(err);
 
-                assert.equal(1, res.body.length);
-                assert.equal(12, res.body[0].homeTeamID);
-                assert.equal('Brooklyn', res.body[0].homeTeamCity);
-                assert.equal('NY', res.body[0].homeTeamState);
-                assert.equal('Barclays Center', res.body[0].homeStadiumName);
-                assert.equal('40.68265, -73.974689', res.body[0].homePosition);
-                assert.equal('New York Islanders', res.body[0].homeTeamName);
-                assert.equal(21, res.body[0].awayTeamID);
-                assert.equal('Los Angeles Kings', res.body[0].awayTeamName);
-                assert.equal(1, res.body[0].sportID);
-                assert.equal('07:00:00', res.body[0].time);
-                assert.equal('2015-03-26T04:00:00.000Z', res.body[0].date);
-                assert.equal('18', res.body[0].distance);
+                assert.equal(1, res.body.nhl.length);
+                assert.equal(12, res.body.nhl[0].homeTeamID);
+                assert.equal('Brooklyn', res.body.nhl[0].homeTeamCity);
+                assert.equal('NY', res.body.nhl[0].homeTeamState);
+                assert.equal('Barclays Center', res.body.nhl[0].homeStadiumName);
+                assert.equal('40.68265, -73.974689', res.body.nhl[0].homePosition);
+                assert.equal('New York Islanders', res.body.nhl[0].homeTeam);
+                assert.equal(21, res.body.nhl[0].awayTeamID);
+                assert.equal('Los Angeles Kings', res.body.nhl[0].awayTeam);
+                assert.equal(1, res.body.nhl[0].sportID);
+                assert.equal('07:00:00', res.body.nhl[0].time);
+                assert.equal('2015-03-26T04:00:00.000Z', res.body.nhl[0].date);
+                assert.equal('18', res.body.nhl[0].distance);
 
                 done();
             });
