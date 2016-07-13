@@ -26,9 +26,6 @@ module.exports = function init(enableLogging) {
     app.use(cookieParser());
     app.use(allowCrossDomain);
 
-    var schedules = require('./routes/schedules');
-    app.use('/schedules', schedules);
-
     var teamRoutes = require('./routes/teamRoutes');
     app.use('/teams', teamRoutes);
 

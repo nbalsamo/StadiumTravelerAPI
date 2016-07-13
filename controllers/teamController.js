@@ -1,10 +1,8 @@
 ﻿'use strict';
 
 var teamRepository = require('../repositories/teamRepository.js')();
-var scheduleRepository = require('../repositories/scheduleRepository');
 
 var url = require('url');
-
 
 module.exports = function teamController() {
     return {
@@ -40,7 +38,7 @@ module.exports = function teamController() {
         },
 
         getSchedule: function(req, res, next) {
-            scheduleRepository.getSchedule(req.params.teamID, req.query.filter)
+            teamRepository.getSchedule(req.params.teamID, req.query.filter)
                 .then(function(content) {
                     res.json(content);
                 }).catch(function(err) {
