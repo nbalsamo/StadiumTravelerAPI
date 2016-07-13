@@ -23,7 +23,7 @@ describe('GET teams/{teamID}/schedule - GET a Team\'s Schedule', function() {
             .end(function(err, res) {
                 if (err) return done(err);
 
-                assert.equal(res.body.length, 129);
+                assert.equal(res.body.length, 211);
 
                 //just testing the body is set correctly - not checking data integrity yet
                 assert.ok(res.body[0].awayTeam);
@@ -31,6 +31,9 @@ describe('GET teams/{teamID}/schedule - GET a Team\'s Schedule', function() {
                 assert.ok(res.body[0].time);
                 assert.ok(res.body[0].date);
                 assert.equal(res.body[0].isHome, 0);
+                assert.ok(res.body[0].homeTeamCity);
+                assert.ok(res.body[0].homeTeamState);
+                assert.ok(res.body[0].homeStadiumName);
 
                 done();
             });
@@ -41,7 +44,7 @@ describe('GET teams/{teamID}/schedule - GET a Team\'s Schedule', function() {
             .end(function(err, res) {
                 if (err) return done(err);
 
-                assert.equal(res.body.length, 64);
+                assert.equal(res.body.length, 105);
 
                 //just testing the body is set correctly - not checking data integrity yet
                 assert.ok(res.body[0].awayTeam);
@@ -59,7 +62,7 @@ describe('GET teams/{teamID}/schedule - GET a Team\'s Schedule', function() {
             .end(function(err, res) {
                 if (err) return done(err);
 
-                assert.equal(res.body.length, 65);
+                assert.equal(res.body.length, 106);
 
                 //just testing the body is set correctly - not checking data integrity yet
                 assert.ok(res.body[0].awayTeam);

@@ -11,13 +11,13 @@ var getSchedule = function(teamID, filter) {
                 return reject(err);
             }
 
-            var homeSQL = 'SELECT away.team_name as away_team, home.team_name as home_team, s.date, s.time, 1 AS home ' +
+            var homeSQL = 'SELECT away.team_name as away_team, home.team_name as home_team, s.date, s.time, 1 AS home, home.stadium_name as "homeStadiumName", home.team_city as "homeTeamCity", home.team_state as "homeTeamState" ' +
                 'FROM teams away ' +
                 'INNER JOIN schedules s ON (away.team_id = s.away_team_id) ' +
                 'INNER JOIN teams home ON (home.team_id = s.home_team_id) ' +
                 'WHERE s.home_team_id=$1::bigint ';
 
-            var awaySQL = 'SELECT away.team_name as away_team, home.team_name as home_team, s.date, s.time, 0 AS home ' +
+            var awaySQL = 'SELECT away.team_name as away_team, home.team_name as home_team, s.date, s.time, 0 AS home, home.stadium_name as "homeStadiumName", home.team_city as "homeTeamCity", home.team_state as "homeTeamState" ' +
                 'FROM teams home ' +
                 'INNER JOIN schedules s ON (home.team_id = s.home_team_id) ' +
                 'INNER JOIN teams away ON (away.team_id = s.away_team_id) ' +
@@ -53,7 +53,10 @@ var buildScheduleFromRaw = function(row) {
         homeTeam: row.home_team,
         time: row.time,
         date: new Date(row.date).toLocaleDateString('en-US'),
-        isHome: row.home
+        isHome: row.home,
+        homeStadiumName: row.homeStadiumName,
+        homeTeamCity: row.homeTeamCity,
+        homeTeamState: row.homeTeamState
     };
     return game;
 };
