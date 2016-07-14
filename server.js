@@ -26,7 +26,18 @@ module.exports = function init(enableLogging) {
     app.use(cookieParser());
     app.use(allowCrossDomain);
 
-    var teamRoutes = require('./routes/teamRoutes');
+
+    //dependencies 
+    var db = require('./common/database')();
+
+    //repositories
+    var teamRepository = require('./repositories/teamRepository.js')(db);
+
+    //controllers
+    var teamController = require('./controllers/teamController')(teamRepository);
+
+    //routes
+    var teamRoutes = require('./routes/teamRoutes')(teamController);
     app.use('/teams', teamRoutes);
 
 

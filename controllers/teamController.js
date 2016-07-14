@@ -1,13 +1,9 @@
 ﻿'use strict';
-
-var teamRepository = require('../repositories/teamRepository.js')();
-
 var url = require('url');
 
-module.exports = function teamController() {
+module.exports = function teamController(teamRepository) {
     return {
 
-        /*Search for a team using strings*/
         searchTeam: function(req, res, next) {
             var url_parts = url.parse(req.url, true);
             if (url_parts.query.hasOwnProperty('q')) {
@@ -27,7 +23,6 @@ module.exports = function teamController() {
             }
         },
 
-        /*Search for a team using teamID*/
         getTeamByID: function(req, res, next) {
             teamRepository.searchTeamByID(req.params.teamID)
                 .then(function(content) {

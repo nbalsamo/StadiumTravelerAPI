@@ -1,155 +1,125 @@
 ﻿'use strict';
 
-var database = require('../common/database');
-var pg = require('pg');
 var _ = require('lodash');
 var scheduleFilter = require('../enum/scheduleFilter');
 
 
-module.exports = function() {
+module.exports = function(db) {
     var selectTeamSql = 'select team_id as "teamID", team_name as "teamName", team_city as "teamCity", stadium_name as "stadiumName", position, sport_id as "sportID" ';
 
     return {
         searchTeam: function(teamName) {
             return new Promise(function(resolve, reject) {
-                pg.connect(database.connectionString, function(err, client, done) {
+                db.query(selectTeamSql + ' from teams where team_name=$1', [teamName], function(err, result) {
                     if (err) {
                         return reject(err);
                     }
-                    client.query(selectTeamSql + ' from teams where team_name=$1::text', [teamName], function(err, result) {
-                        done();
-                        if (err) {
-                            return reject(err);
-                        }
-                        if (result.rows.length > 0) {
-                            return resolve(result.rows[0]); //Right now we are only returning one team
-                        }
-                        return resolve();
-                    });
+                    if (result.rows.length > 0) {
+                        return resolve(result.rows[0]); //Right now we are only returning one team
+                    }
+                    return resolve();
                 });
             });
         },
 
         searchTeamByID: function(teamID) {
             return new Promise(function(resolve, reject) {
-                pg.connect(database.connectionString, function(err, client, done) {
+                db.query(selectTeamSql + 'from teams where team_id=$1', [teamID], function(err, result) {
                     if (err) {
                         return reject(err);
                     }
-                    client.query(selectTeamSql + 'from teams where team_id=$1::bigint', [teamID], function(err, result) {
-                        done();
-                        if (err) {
-                            return reject(err);
-                        }
-                        if (result.rows.length === 1) { //This should only return one team
-                            return resolve(result.rows[0]);
-                        }
-                        return reject('Invalid Team ID'); //TODO - this will result in a 500. It should be returning a 400
+                    if (result.rows.length > 0) {
+                        return resolve(result.rows[0]);
+                    }
+                    return reject({
+                        message: 'Invalid Team ID',
+                        status: 400
                     });
                 });
+
             });
         },
 
         getAllTeams: function() {
             return new Promise(function(resolve, reject) {
-                pg.connect(database.connectionString, function(err, client, done) {
+                db.query(selectTeamSql + ' from teams', function(err, result) {
                     if (err) {
                         return reject(err);
                     }
-                    client.query(selectTeamSql + ' from teams', function(err, result) {
-                        done();
-                        if (err) {
-                            return reject(err);
-                        }
-
-                        return resolve(result.rows);
-                    });
+                    return resolve(result.rows);
                 });
             });
         },
 
         getSurroundingSchedule: function(teamID, date, distance) {
             return new Promise(function(resolve, reject) {
-                pg.connect(database.connectionString, function(err, client, done) {
+
+                var sql = 'WITH distanceTable AS (' +
+                    'SELECT * from distances where team_id = $1 AND distance < $2' +
+                    ') SELECT ' +
+                    'home.team_id as "homeTeamID" ,' +
+                    'home.team_city as "homeTeamCity",' +
+                    'home.team_state as "homeTeamState",' +
+                    'home.stadium_name as "homeStadiumName",' +
+                    'home.position as "homePosition", ' +
+                    'home.team_name as "homeTeam", ' +
+                    'away.team_id as "awayTeamID", ' +
+                    'away.team_name as "awayTeam",' +
+                    's.sport_id as "sportID", ' +
+                    's.time, ' +
+                    's.date,' +
+                    'd.distance ' +
+                    'FROM schedules s ' +
+                    'INNER JOIN teams home on home.team_id = s.home_team_id ' +
+                    'INNER JOIN teams away on away.team_id = s.away_team_id ' +
+                    'INNER JOIN distanceTable d on d.destination_team_id = s.home_team_id ' +
+                    'WHERE s.date >= $3::date - 1 ' +
+                    'AND s.date <= $3::date + 1';
+
+
+                db.query(sql, [teamID, distance, date], function(err, result) {
                     if (err) {
                         return reject(err);
                     }
-
-                    var sql = 'WITH distanceTable AS (' +
-                        'SELECT * from distances where team_id = $1::bigint AND distance < $2::bigint' +
-                        ') SELECT ' +
-                        'home.team_id as "homeTeamID" ,' +
-                        'home.team_city as "homeTeamCity",' +
-                        'home.team_state as "homeTeamState",' +
-                        'home.stadium_name as "homeStadiumName",' +
-                        'home.position as "homePosition", ' +
-                        'home.team_name as "homeTeam", ' +
-                        'away.team_id as "awayTeamID", ' +
-                        'away.team_name as "awayTeam",' +
-                        's.sport_id as "sportID", ' +
-                        's.time, ' +
-                        's.date,' +
-                        'd.distance ' +
-                        'FROM schedules s ' +
-                        'INNER JOIN teams home on home.team_id = s.home_team_id ' +
-                        'INNER JOIN teams away on away.team_id = s.away_team_id ' +
-                        'INNER JOIN distanceTable d on d.destination_team_id = s.home_team_id ' +
-                        'WHERE s.date >= $3::date - 1 ' +
-                        'AND s.date <= $3::date + 1';
-
-
-                    client.query(sql, [teamID, distance, date], function(err, result) {
-                        done();
-                        if (err) {
-                            return reject(err);
-                        }
-                        return resolve(buildSurroundingSchedule(result.rows));
-
-                    });
+                    return resolve(buildSurroundingSchedule(result.rows));
                 });
             });
         },
 
         getSchedule: function(teamID, filter) {
             return new Promise(function(resolve, reject) {
-                pg.connect(database.connectionString, function(err, client, done) {
-                    if (err) {
-                        return reject(err);
-                    }
 
-                    var homeSQL = 'SELECT away.team_name as away_team, home.team_name as home_team, s.date, s.time, 1 AS home, home.stadium_name as "homeStadiumName", home.team_city as "homeTeamCity", home.team_state as "homeTeamState" ' +
-                        'FROM teams away ' +
-                        'INNER JOIN schedules s ON (away.team_id = s.away_team_id) ' +
-                        'INNER JOIN teams home ON (home.team_id = s.home_team_id) ' +
-                        'WHERE s.home_team_id=$1::bigint ';
+                var homeSQL = 'SELECT away.team_name as away_team, home.team_name as home_team, s.date, s.time, 1 AS home, home.stadium_name as "homeStadiumName", home.team_city as "homeTeamCity", home.team_state as "homeTeamState" ' +
+                    'FROM teams away ' +
+                    'INNER JOIN schedules s ON (away.team_id = s.away_team_id) ' +
+                    'INNER JOIN teams home ON (home.team_id = s.home_team_id) ' +
+                    'WHERE s.home_team_id=$1 ';
 
-                    var awaySQL = 'SELECT away.team_name as away_team, home.team_name as home_team, s.date, s.time, 0 AS home, home.stadium_name as "homeStadiumName", home.team_city as "homeTeamCity", home.team_state as "homeTeamState" ' +
-                        'FROM teams home ' +
-                        'INNER JOIN schedules s ON (home.team_id = s.home_team_id) ' +
-                        'INNER JOIN teams away ON (away.team_id = s.away_team_id) ' +
-                        'WHERE s.away_team_id=$1::bigint ';
+                var awaySQL = 'SELECT away.team_name as away_team, home.team_name as home_team, s.date, s.time, 0 AS home, home.stadium_name as "homeStadiumName", home.team_city as "homeTeamCity", home.team_state as "homeTeamState" ' +
+                    'FROM teams home ' +
+                    'INNER JOIN schedules s ON (home.team_id = s.home_team_id) ' +
+                    'INNER JOIN teams away ON (away.team_id = s.away_team_id) ' +
+                    'WHERE s.away_team_id=$1 ';
 
-                    var sql = '';
+                var sql = '';
 
-                    if (filter == scheduleFilter.HOME) {
-                        sql = homeSQL + 'ORDER BY date';
-                    } else if (filter == scheduleFilter.AWAY) {
-                        sql = awaySQL + 'ORDER BY date';
-                    } else {
-                        sql = homeSQL + 'UNION ALL ' + awaySQL + 'ORDER BY date';
-                    }
+                if (filter == scheduleFilter.HOME) {
+                    sql = homeSQL + 'ORDER BY date';
+                } else if (filter == scheduleFilter.AWAY) {
+                    sql = awaySQL + 'ORDER BY date';
+                } else {
+                    sql = homeSQL + 'UNION ALL ' + awaySQL + 'ORDER BY date';
+                }
 
-                    client.query(sql, [teamID],
-                        function(err, result) {
-                            done();
-                            if (err) {
-                                return reject(err);
-                            }
+                db.query(sql, [teamID],
+                    function(err, result) {
+                        if (err) {
+                            return reject(err);
+                        }
 
-                            var data = result.rows.map(buildScheduleFromRaw);
-                            return resolve(data);
-                        });
-                });
+                        var data = result.rows.map(buildScheduleFromRaw);
+                        return resolve(data);
+                    });
             });
         }
     };
