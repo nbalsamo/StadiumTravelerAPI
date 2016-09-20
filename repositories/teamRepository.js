@@ -89,13 +89,13 @@ module.exports = function(db) {
         getSchedule: function(teamID, filter) {
             return new Promise(function(resolve, reject) {
 
-                var homeSQL = 'SELECT away.team_name as away_team, home.team_name as home_team, s.date, s.time, 1 AS home, home.stadium_name as "homeStadiumName", home.team_city as "homeTeamCity", home.team_state as "homeTeamState" ' +
+                var homeSQL = 'SELECT away.team_name as away_team, home.team_name as home_team, home.team_id as home_team_id, s.date, s.time, 1 AS home, home.stadium_name as "homeStadiumName", home.team_city as "homeTeamCity", home.team_state as "homeTeamState" ' +
                     'FROM teams away ' +
                     'INNER JOIN schedules s ON (away.team_id = s.away_team_id) ' +
                     'INNER JOIN teams home ON (home.team_id = s.home_team_id) ' +
                     'WHERE s.home_team_id=$1 ';
 
-                var awaySQL = 'SELECT away.team_name as away_team, home.team_name as home_team, s.date, s.time, 0 AS home, home.stadium_name as "homeStadiumName", home.team_city as "homeTeamCity", home.team_state as "homeTeamState" ' +
+                var awaySQL = 'SELECT away.team_name as away_team, home.team_name as home_team, home.team_id as home_team_id, s.date, s.time, 0 AS home, home.stadium_name as "homeStadiumName", home.team_city as "homeTeamCity", home.team_state as "homeTeamState" ' +
                     'FROM teams home ' +
                     'INNER JOIN schedules s ON (home.team_id = s.home_team_id) ' +
                     'INNER JOIN teams away ON (away.team_id = s.away_team_id) ' +
@@ -128,6 +128,7 @@ module.exports = function(db) {
         var game = {
             awayTeam: row.away_team,
             homeTeam: row.home_team,
+            homeTeamID: row.home_team_id,
             time: row.time,
             date: new Date(row.date).toLocaleDateString('en-US'),
             isHome: row.home,
